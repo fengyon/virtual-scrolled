@@ -3,3 +3,4 @@ tsconfig.js
 tsconfig.ts
 bin/*
 lib/*
+dist

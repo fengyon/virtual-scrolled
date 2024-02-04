@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const prettierConfig = require('./.prettier.config.js')
+const prettierConfig = require('./.prettierrc.js')
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -20,6 +20,7 @@ module.exports = {
     amd: true,
     es6: true,
     mocha: true,
+    webextensions: true,
   },
   globals: {
     NodeJS: true,
@@ -42,6 +43,8 @@ module.exports = {
       jsx: true,
       modules: true,
     },
+    lib: ['ES2016', 'dom'],
+    tsconfigRootDir: '.',
   },
   plugins: ['@typescript-eslint', 'prettier'],
 
@@ -353,13 +356,7 @@ module.exports = {
     // 禁止将 undefined 作为标识符
     'no-undefined': 0,
     // 禁止出现未使用过的变量
-    'no-unused-vars': [
-      0,
-      {
-        vars: 'all',
-        args: 'after-used',
-      },
-    ],
+    'no-unused-vars': 0,
     // 不允许在变量定义之前使用它们
     'no-use-before-define': 2,
 
@@ -442,14 +439,8 @@ module.exports = {
     'func-names': 0,
     // 文件末尾强制换行
     'eol-last': 2,
-    // 强制使用2个空格缩进
-    indent: [
-      2,
-      2,
-      {
-        SwitchCase: 1,
-      },
-    ],
+    // 强制使用2个空格缩进, 关闭eslint，使用prettier格式化
+    indent: 0,
     // 强制在对象字面量的属性中键和值之间使用一致的间距
     'key-spacing': [
       2,
@@ -714,5 +705,9 @@ module.exports = {
     'yield-star-spacing': 2,
     // 禁用require导入
     '@typescript-eslint/no-var-requires': 1,
+    // 禁止使用any
+    '@typescript-eslint/no-explicit-any': 1,
+    // 禁止未使用变量
+    '@typescript-eslint/no-unused-vars': [2, { vars: 'all', args: 'after-used' }],
   },
 }

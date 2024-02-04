@@ -1,8 +1,8 @@
-import { ComputedRef } from "vue";
+import { ComputedRef } from 'vue'
 
 export interface InterUtils {
-  startObserve(): void;
-  pauseObserve(): void;
-  fullEntries: ComputedRef<IntersectionObserverEntry[]>;
-  flushFullEntries(): void;
+  startObserve(): void
+  pauseObserve(): void
+  fullEntries: ComputedRef<IntersectionObserverEntry[]>
+  flushFullEntries(): void
 }
