@@ -1,0 +1,48 @@
+{
+  "name": "@virtual-scrolled/core",
+  "version": "0.0.0",
+  "description": "the core modules of @virtual-scrolled",
+  "keywords": [
+    "virtual-scrolled",
+    "virtual",
+    "scroll",
+    "virtual-scroll",
+    "core"
+  ],
+  "author": "fengyon <fyg1234@yeah.net>",
+  "homepage": "https://github.com/fengyon/virtual-scrolled#readme",
+  "license": "MIT",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib",
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "public": "true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fengyon/virtual-scrolled.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/core.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/fengyon/virtual-scrolled/issues"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "core-js": "^3.34.0",
+    "intersection-observer": "^0.12.2",
+    "lodash-es": "^4.17.2"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12"
+  }
+}

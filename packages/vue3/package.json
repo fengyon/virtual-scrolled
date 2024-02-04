@@ -1,0 +1,45 @@
+{
+  "name": "@virtual-scrolled/vue3",
+  "version": "0.0.0",
+  "description": "A component and hook for efficiently rendering large lists for vue3",
+  "keywords": [
+    "component",
+    "hook",
+    "vue3",
+    "virtual",
+    "scroll"
+  ],
+  "author": "fengyon <fyg1234@yeah.net>",
+  "homepage": "https://github.com/fengyon/virtual-scrolled#readme",
+  "license": "MIT",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib",
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "public": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fengyon/virtual-scrolled.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/vue3.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/fengyon/virtual-scrolled/issues"
+  },
+  "dependencies": {
+    "@virtual-scrolled/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}

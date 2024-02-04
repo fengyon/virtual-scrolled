@@ -1,0 +1,39 @@
+{
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // 设置保存时格式化。只用于用于格式化css/less程序
+  "editor.formatOnSave": true,
+  // 关闭js/ts的默认format,统一用eslint进行格式化（tslint已经不维护了，所以转eslint吧）
+  "javascript.format.enable": false,
+  "typescript.format.enable": false,
+  // 开启eslint自动修复js/ts/jsx/tsx功能
+  "git.autofetch": true,
+  "workbench.startupEditor": "none",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.tabSize": 2,
+  "editor.defaultFormatter": "vscode.typescript-language-features",
+  "workbench.editor.limit.enabled": true,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "eslint.migration.2_x": "off",
+  "eslint.format.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "vue",
+    "html",
+    "typescript"
+  ],
+  "eslint.codeActionsOnSave.rules": null,
+  "eslint.packageManager": "yarn",
+  "eslint.alwaysShowStatus": true
+}
