@@ -24,9 +24,8 @@ export const getRect = (element: HTMLElement): DOMRect => {
   }
 }
 
-const parseRootMargin = (rootMargin?: string, rootRect?: DOMRect): Margin => {
-  const marginString = rootMargin || '0px'
-  const margins = marginString.split(/\s+/).map(function (margin) {
+const parseRootMargin = (rootMargin: string, rootRect: DOMRect): Margin => {
+  const margins = rootMargin.split(/\s+/).map(function (margin) {
     const parts = /^(-?\d*\.?\d+)(px|%)$/.exec(margin)
     if (!parts) {
       throw new Error('rootMargin must be specified in pixels or percent')
@@ -39,15 +38,15 @@ const parseRootMargin = (rootMargin?: string, rootRect?: DOMRect): Margin => {
   margins[2] = margins[2] || margins[0]
   margins[3] = margins[3] || margins[1]
 
-  const [top, right, bottom, left] = margins.map(function (margin, i) {
-    return margin.unit == 'px' ? margin.value : (margin.value * (i % 2 ? rootRect.width : rootRect.height)) / 100
+  const [top, right, bottom, left] = margins.map(({ unit, value }, i) => {
+    return unit == 'px' ? value : (value * (i % 2 ? rootRect.width : rootRect.height)) / 100
   })
   return { top, right, bottom, left }
 }
 
 const getIntersectRange = (intersectEle?: HTMLElement, rootMargin?: string): Margin => {
   const rect = getRect(intersectEle || document.documentElement)
-  const margin = parseRootMargin(rootMargin, rect)
+  const margin = parseRootMargin(rootMargin || '0px', rect)
   return {
     top: rect.top - margin.top,
     right: rect.right + margin.right,

@@ -1,8 +1,7 @@
 import { FunctionType } from './types'
 
-const hasOwnProperty = Object.prototype.hasOwnProperty
-export const objectToString = Object.prototype.toString
-export const toTypeString = (value: unknown): string => objectToString.call(value)
+const { hasOwnProperty, toString } = Object.prototype
+export const toTypeString = (value: unknown): string => toString.call(value)
 export const hasOwn = (val: object, key: string | symbol): key is keyof typeof val => hasOwnProperty.call(val, key)
 
 export const isArray = Array.isArray

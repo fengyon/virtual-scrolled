@@ -12,9 +12,9 @@ import {
   shallowReactive,
   watch,
 } from 'vue'
-import { useIntersectionObserver } from './use-intersection-observer'
-import { scrollSmooth } from '@virtual-scrolled/core'
+import { isIntersect, isOverlap, scrollSmooth, single } from '@virtual-scrolled/core'
 import { getNativeElement, getBoundingClientRect } from './utils'
+import { useIntersectionObserver } from './use-intersection-observer'
 
 interface Preload {
   prev: number
@@ -110,45 +110,6 @@ const getOptions = (inputOptions: VirtualScrollOptions): DealedOptions => {
     activeIndex,
   }
 }
-const isOverlap = ([left1, right1], [left2, right2]) =>
-  (left1 < left2 && right1 > left2) ||
-  (left1 < right2 && right1 > right2) ||
-  (left1 >= left2 && left1 <= right2) ||
-  (right1 >= left2 && right1 <= right2)
-
-const isInView = (domRect: DOMRect) => {
-  if (!domRect) {
-    return false
-  }
-  const viewHeight = window.innerHeight || document.documentElement.clientHeight
-  const viewWidth = window.innerWidth || document.documentElement.clientWidth
-
-  return (
-    isOverlap([domRect.top, domRect.bottom], [0, viewHeight]) &&
-    isOverlap([domRect.left, domRect.right], [0, viewWidth])
-  )
-}
-
-const singleAsync = (fn) => {
-  let isCalling = false
-  let callingPromise
-  return async function (...args) {
-    if (isCalling) {
-      return callingPromise
-    }
-    isCalling = true
-    try {
-      callingPromise = fn.apply(this, args)
-      const result = await callingPromise
-      isCalling = false
-      return result
-    } catch (e) {
-      callingPromise = undefined
-      isCalling = false
-      throw e
-    }
-  }
-}
 
 export const useVirtualScroll = (options: VirtualScrollOptions) => {
   const { preload, itemsMap, scrollContainer, activeIndexs, stopper, activeIndex } = getOptions(options)
@@ -205,7 +166,7 @@ export const useVirtualScroll = (options: VirtualScrollOptions) => {
   const renderedActives = computed(
     () => new Map(Array.from(activeIndexs.entries()).filter(([, value]) => getNativeElement(value)))
   )
-  const loadMore = singleAsync(async () => {
+  const loadMore = single(async () => {
     await nextTick()
     itemsMap.value.forEach((item, index) => {
       if (isOverlap(preloadRange.value, [index, index])) {
@@ -217,7 +178,7 @@ export const useVirtualScroll = (options: VirtualScrollOptions) => {
     await nextTick()
     const visibleIndexs = Array.from(activeIndexs.entries())
       .sort(([index1], [index2]) => index1 - index2)
-      .filter(([, element]) => isInView(getBoundingClientRect(element)!))
+      .filter(([, element]) => isIntersect(element))
       .map(([index]) => index)
     if (!visibleIndexs.length) {
       return

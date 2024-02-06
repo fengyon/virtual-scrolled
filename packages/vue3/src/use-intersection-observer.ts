@@ -8,13 +8,10 @@ import {
   watch,
   shallowReactive,
   shallowRef,
-  ComponentInternalInstance,
 } from 'vue'
 import { isHtmlElement } from '@virtual-scrolled/core'
-import { InterUtils } from './types'
-import { getNativeElement } from './utils'
-
-type Refable<T> = T | Ref<T>
+import { InterUtils, RefHtmlElement, Refable } from './types'
+import { getNativeElement, getRaw } from './utils'
 
 const getDiffArray = (newValue: Array<any>, oldValue: Array<any>) => {
   const newSet = new Set(newValue)
@@ -23,55 +20,29 @@ const getDiffArray = (newValue: Array<any>, oldValue: Array<any>) => {
 }
 
 export const useIntersectionObserver = (
-  refs: Refable<Array<Refable<HTMLElement | null | ComponentInternalInstance>>>,
+  refs: Refable<Array<RefHtmlElement>>,
   options?: IntersectionObserverInit
-): [Ref<Array<IntersectionObserverEntry>>, InterUtils, IntersectionObserver] => {
+): [Ref<Array<IntersectionObserverEntry>>, InterUtils] => {
   let isPause = false
 
-  const refsArr = computed(() => (Array.isArray(refs) ? refs : refs.value) || [])
-  // const elementIndexMap = computed(
-  //   () =>
-  //     new WeakMap<HTMLElement, number>(
-  //       refsArr.value
-  //         .map(getNativeElement)
-  //         .map((item, index) => [item, index] as [HTMLElement, number])
-  //         .filter(([item]) => isHtmlElement(item))
-  //     )
-  // )
   const entriesMap = shallowReactive(new WeakMap())
 
-  const elementArr = computed(() => refsArr.value.map(getNativeElement).filter(isHtmlElement))
+  const elementArr = computed(() => getRaw(refs).map(getNativeElement).filter(isHtmlElement))
+  let addedElements = []
+
   const entriesArr: Ref<IntersectionObserverEntry[]> = shallowRef([])
-  const fullEntries: ComputedRef<IntersectionObserverEntry[]> = computed(() =>
-    elementArr.value.map((item) => entriesMap.get(item)).filter(Boolean)
+  const fullEntries: ComputedRef<Array<IntersectionObserverEntry | null>> = computed(() =>
+    elementArr.value.map((item) => entriesMap.get(item) ?? null)
   )
 
-  const onTakeRecords = (entriesArg: IntersectionObserverEntry[]) => {
-    entriesArg.forEach((item) => entriesMap.set(item.target, item))
-    entriesArr.value = entriesArg
+  const onTakeRecords = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach((item) => entriesMap.set(item.target, item))
+    entriesArr.value = entries
   }
 
   const observer = new IntersectionObserver(onTakeRecords, options)
 
   const scope = effectScope()
-
-  onMounted(() => {
-    scope.run(() => {
-      watch(
-        () => elementArr.value,
-        (newValue, oldValue) => {
-          if (isPause) {
-            return
-          }
-          const [addedElements, removedElements] = getDiffArray(newValue, oldValue)
-          addedElements.forEach((element) => observer.observe(element))
-          removedElements.forEach((element) => observer.unobserve(element))
-        },
-        { immediate: true } as object
-      )
-    })
-  })
-
   const flushFullEntries = () => {
     const records = observer.takeRecords()
     records.forEach((item) => entriesMap.set(item.target, item))
@@ -79,18 +50,38 @@ export const useIntersectionObserver = (
 
   const startObserve = () => {
     isPause = false
+    addedElements = elementArr.value
     elementArr.value.forEach((item) => observer.observe(item))
   }
 
   const pauseObserve = () => {
     isPause = true
+    addedElements = []
     elementArr.value.forEach((item) => observer.unobserve(item))
   }
 
-  onBeforeUnmount(() => {
+  const stopObserve = () => {
     observer.disconnect()
     scope.stop()
+  }
+
+  onMounted(() => {
+    scope.run(() => {
+      watch(
+        () => elementArr.value,
+        (newValue) => {
+          if (isPause) return
+          const [addElements, removeElements] = getDiffArray(newValue, addedElements)
+          addElements.forEach((element) => observer.observe(element))
+          removeElements.forEach((element) => observer.unobserve(element))
+          addedElements = newValue
+        },
+        { immediate: true } as object
+      )
+    })
   })
 
-  return [entriesArr, { startObserve, pauseObserve, fullEntries, flushFullEntries }, observer]
+  onBeforeUnmount(stopObserve)
+
+  return [entriesArr, { startObserve, pauseObserve, fullEntries, flushFullEntries, stopObserve }]
 }
